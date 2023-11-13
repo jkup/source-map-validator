@@ -8,7 +8,12 @@ import { validateSourceMapFormat } from "./validators/validateSourceMapFormat";
 import { validateSourceFiles } from "./validators/validateSourceFiles";
 import { validateSourceMapMappings } from "./validators/validateSourceMapMappings";
 
-async function validateSourceMap() {
+type ValidatorResult = {
+  result: boolean;
+  message: string;
+};
+
+async function validateSourceMap(): Promise<ValidatorResult> {
   const parser = yargs(process.argv.slice(2))
     .usage("Usage: -s <source map> -g <generated file> -o <original file>")
     .options({
@@ -43,6 +48,11 @@ async function validateSourceMap() {
   validateSourceMapFormat(sourceMap, sourceMapPath);
   validateSourceFiles(sourceMap, originalFolderPath);
   validateSourceMapMappings(sourceMap, originalFolderPath, generatedFilePath);
+
+  return {
+    result: true,
+    message: "Source map is valid.",
+  };
 }
 
 validateSourceMap();

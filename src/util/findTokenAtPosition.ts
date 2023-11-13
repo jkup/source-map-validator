@@ -1,4 +1,4 @@
-import { Token, type Tokens } from "./token";
+import { type Token } from "./token";
 
 export function findTokenAtPosition(
   tokens: any[] | null | undefined,

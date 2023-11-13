@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import babelParser from "@babel/parser";
+import { parse } from "@babel/parser";
 
 export function parseSourceFiles(originalFolderPath: string) {
   const filesASTMap = new Map();
@@ -12,7 +12,7 @@ export function parseSourceFiles(originalFolderPath: string) {
       // Ensure it's a JavaScript file
       const filePath = path.join(originalFolderPath, file);
       const fileContent = fs.readFileSync(filePath, "utf8");
-      const ast = babelParser.parse(fileContent, {
+      const ast = parse(fileContent, {
         sourceType: "module",
         tokens: true,
       });

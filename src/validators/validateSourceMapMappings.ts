@@ -1,11 +1,9 @@
 import fs from "fs";
 import { SourceMapConsumer } from "source-map";
-import babelParser from "@babel/parser";
-
+import { parse } from "@babel/parser";
 import { parseSourceFiles } from "../util/parseSourceFiles";
 import { findTokenAtPosition } from "../util/findTokenAtPosition";
 import { tokensMatch } from "../util/tokensMatch";
-import { type Tokens } from "../util/token";
 
 export async function validateSourceMapMappings(
   sourceMap: any,
@@ -18,7 +16,7 @@ export async function validateSourceMapMappings(
 
     // Parse generated file
     const generatedCode = fs.readFileSync(generatedFilePath, "utf8");
-    const generatedAST = babelParser.parse(generatedCode, {
+    const generatedAST = parse(generatedCode, {
       sourceType: "module",
       tokens: true,
     });
@@ -50,6 +48,7 @@ export async function validateSourceMapMappings(
     console.log("Mappings validation completed.");
   } catch (err) {
     // @ts-ignore
-    console.error("Error in mapping validation: ", err.message);
+    // console.error("Error in mapping validation: ", err.message);
+    console.error(err);
   }
 }
