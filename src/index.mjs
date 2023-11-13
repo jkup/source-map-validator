@@ -4,9 +4,9 @@ import yargs from "yargs";
 import fs from "fs";
 import path from "path";
 
-import { validateSourceMapFormat } from "./validateSourceMapFormat.mjs";
-import { validateSourceFiles } from "./validateSourceFiles.mjs";
-import { validateSourceMapMappings } from "./validateSourceMapMappings.mjs";
+import { validateSourceMapFormat } from "./validators/validateSourceMapFormat.mjs";
+import { validateSourceFiles } from "./validators/validateSourceFiles.mjs";
+import { validateSourceMapMappings } from "./validators/validateSourceMapMappings.mjs";
 
 const options = yargs(process.argv.slice(2))
   .usage("Usage: -s <source map> -g <generated file> -o <original file>")
@@ -38,4 +38,4 @@ const sourceMap = JSON.parse(sourceMapContent);
 
 validateSourceMapFormat(sourceMap, sourceMapPath);
 validateSourceFiles(sourceMap, originalFolderPath);
-validateSourceMapMappings(sourceMap, generatedFilePath);
+validateSourceMapMappings(sourceMap, originalFolderPath, generatedFilePath);
