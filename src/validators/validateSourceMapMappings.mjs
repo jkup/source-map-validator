@@ -3,8 +3,8 @@ import { SourceMapConsumer } from "source-map";
 import babelParser from "@babel/parser";
 
 import { parseSourceFiles } from "../util/parseSourceFiles.mjs";
-import { findNodeInAST } from "../util/findNodeInAST.mjs";
-import { nodesAreEqual } from "../util/nodesAreEqual.mjs";
+import { findTokenAtPosition } from "../util/findTokenAtPosition.mjs";
+import { tokensMatch } from "../util/tokensMatch.mjs";
 
 export async function validateSourceMapMappings(
   sourceMap,
@@ -19,28 +19,29 @@ export async function validateSourceMapMappings(
     const generatedCode = fs.readFileSync(generatedFilePath, "utf8");
     const generatedAST = babelParser.parse(generatedCode, {
       sourceType: "module",
+      tokens: true,
     });
 
     await SourceMapConsumer.with(sourceMap, null, (consumer) => {
       consumer.eachMapping((mapping) => {
-        // Find the corresponding node in the generated AST
-        const generatedNode = findNodeInAST(
-          generatedAST,
+        // Get the tokens list for the generated file
+        const generatedToken = findTokenAtPosition(
+          generatedAST.tokens,
           mapping.generatedLine,
           mapping.generatedColumn
         );
 
-        // Find the corresponding node in the original AST
+        // Get the tokens list for the original file
         const originalAST = originalFilesASTs.get(mapping.source);
-        const originalNode = findNodeInAST(
-          originalAST,
+        const originalToken = findTokenAtPosition(
+          originalAST.tokens,
           mapping.originalLine,
           mapping.originalColumn
         );
 
-        // Compare the nodes to validate the mapping
-        if (!nodesAreEqual(generatedNode, originalNode)) {
-          throw new Error("Nodes are not equal.");
+        // Compare the tokens to validate the mapping
+        if (!tokensMatch(generatedToken, originalToken)) {
+          throw new Error("Tokens are not equal.");
         }
       });
     });

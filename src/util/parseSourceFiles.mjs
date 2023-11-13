@@ -12,7 +12,10 @@ export function parseSourceFiles(originalFolderPath) {
       // Ensure it's a JavaScript file
       const filePath = path.join(originalFolderPath, file);
       const fileContent = fs.readFileSync(filePath, "utf8");
-      const ast = babelParser.parse(fileContent, { sourceType: "module" });
+      const ast = babelParser.parse(fileContent, {
+        sourceType: "module",
+        tokens: true,
+      });
       filesASTMap.set(file, ast);
     }
   });
