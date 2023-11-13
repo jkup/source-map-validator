@@ -4,6 +4,7 @@ import yargs from "yargs";
 import fs from "fs";
 import path from "path";
 
+import { validateSourceMapJSON } from "./validators/validateSourceMapJSON.mjs";
 import { validateSourceMapFormat } from "./validators/validateSourceMapFormat.mjs";
 import { validateSourceFiles } from "./validators/validateSourceFiles.mjs";
 import { validateSourceMapMappings } from "./validators/validateSourceMapMappings.mjs";
@@ -33,8 +34,7 @@ const sourceMapPath = path.resolve(options.sourceMap);
 const originalFolderPath = path.resolve(options.originalFolder);
 const generatedFilePath = path.resolve(options.generatedFile);
 
-const sourceMapContent = fs.readFileSync(sourceMapPath, "utf8");
-const sourceMap = JSON.parse(sourceMapContent);
+const sourceMap = validateSourceMapJSON(sourceMapPath);
 
 validateSourceMapFormat(sourceMap, sourceMapPath);
 validateSourceFiles(sourceMap, originalFolderPath);
