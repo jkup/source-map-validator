@@ -13,7 +13,7 @@ export function validateSourceMapJSON(sourceMapPath: string) {
 
     // Return parsed JSON
     return sourceMapJSON;
-  } catch (error) {
-    return false;
+  } catch (error: any) {
+    throw new Error(error.message);
   }
 }

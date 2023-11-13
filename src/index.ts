@@ -45,10 +45,19 @@ async function validateSourceMap(): Promise<ValidatorResult> {
 
   const sourceMap = validateSourceMapJSON(sourceMapPath);
 
-  validateSourceMapFormat(sourceMap, sourceMapPath);
-  validateSourceFiles(sourceMap, originalFolderPath);
-  validateSourceMapMappings(sourceMap, originalFolderPath, generatedFilePath);
+  try {
+    validateSourceMapFormat(sourceMap, sourceMapPath);
+    validateSourceFiles(sourceMap, originalFolderPath);
+    validateSourceMapMappings(sourceMap, originalFolderPath, generatedFilePath);
+  } catch (e: any) {
+    console.error(e.message);
+    return {
+      result: false,
+      message: e.message,
+    };
+  }
 
+  console.log("Source map is valid.");
   return {
     result: true,
     message: "Source map is valid.",

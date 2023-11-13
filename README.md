@@ -4,6 +4,8 @@
 
 `source-map-validator` is a Node.js CLI that validates the correctness of a source map file. It checks if the mappings in the source map file are valid and if they correctly map to the original source files.
 
+Heavily inspired by https://github.com/ben-ng/sourcemap-validator and https://github.com/getsentry/sourcemaps.io.
+
 ## Installation
 
 To install the tool as a global package:
@@ -33,6 +35,8 @@ The project uses a series of validators to check the integrity of source maps:
 Each validator is modular and designed to handle a specific aspect of source map validation.
 
 ## How Tests Work
+
+The test files are generated from https://github.com/kamilogorek/sourcemaps-playground. They should be updated to have more interesting cases and eventually to include our new features like scopes and debug IDs.
 
 Testing is done using a bash script for end-to-end tests.
 
