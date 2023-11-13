@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import babelParser from "@babel/parser";
 
-export function parseSourceFiles(originalFolderPath) {
+export function parseSourceFiles(originalFolderPath: string) {
   const filesASTMap = new Map();
 
   // Read all files in the folder

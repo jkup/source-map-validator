@@ -1,6 +1,10 @@
 import fs from "fs";
+import { type SourceMap } from "../util/sourceMap";
 
-export function validateSourceMapFormat(sourceMap, sourceMapPath) {
+export function validateSourceMapFormat(
+  sourceMap: SourceMap,
+  sourceMapPath: string
+) {
   try {
     if (sourceMap.version !== 3) {
       throw new Error("Source map version is not 3.");
@@ -14,6 +18,7 @@ export function validateSourceMapFormat(sourceMap, sourceMapPath) {
 
     console.log("Source map format is valid.");
   } catch (err) {
+    // @ts-ignore
     console.error("Invalid source map format: ", err.message);
   }
 }

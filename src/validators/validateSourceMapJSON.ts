@@ -1,6 +1,6 @@
 import fs from "fs";
 
-export function validateSourceMapJSON(sourceMapPath) {
+export function validateSourceMapJSON(sourceMapPath: string) {
   try {
     // Check if file exists and can be read
     fs.accessSync(sourceMapPath, fs.constants.R_OK);
