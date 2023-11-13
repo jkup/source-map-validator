@@ -6,6 +6,7 @@ import path from "path";
 
 import { validateSourceMapFormat } from "./validateSourceMapFormat.mjs";
 import { validateSourceFiles } from "./validateSourceFiles.mjs";
+import { validateSourceMapMappings } from "./validateSourceMapMappings.mjs";
 
 const options = yargs(process.argv.slice(2))
   .usage("Usage: -s <source map> -g <generated file> -o <original file>")
@@ -37,3 +38,4 @@ const sourceMap = JSON.parse(sourceMapContent);
 
 validateSourceMapFormat(sourceMap, sourceMapPath);
 validateSourceFiles(sourceMap, originalFolderPath);
+validateSourceMapMappings(sourceMap, generatedFilePath);
