@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/jkup/source-map-validator/issues"
   },
-  "homepage": "https://github.com/jkup/source-map-validator#readme"
+  "homepage": "https://github.com/jkup/source-map-validator#readme",
+  "dependencies": {
+    "source-map": "^0.7.4"
+  }
 }
