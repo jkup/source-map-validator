@@ -13,8 +13,8 @@ type ValidatorResult = {
   message: string;
 };
 
-async function validateSourceMap(): Promise<ValidatorResult> {
-  const parser = yargs(process.argv.slice(2))
+export default async function main(args: string[]): Promise<ValidatorResult> {
+  const parser = yargs(args)
     .usage("Usage: -s <source map> -g <generated file> -o <original file>")
     .options({
       s: {
@@ -69,4 +69,14 @@ async function validateSourceMap(): Promise<ValidatorResult> {
   }
 }
 
-validateSourceMap();
+// Check if the script is called from the command line
+const currentFileUrl = new URL(import.meta.url).pathname;
+const executedFile = process.argv[1];
+
+// On Windows, normalize backslashes to forward slashes
+const currentFileNormalized = currentFileUrl.replace(/\\/g, "/");
+const executedFileNormalized = executedFile.replace(/\\/g, "/");
+
+if (currentFileNormalized === executedFileNormalized) {
+  await main(process.argv.slice(2));
+}

@@ -39,6 +39,7 @@ export async function validateSourceMapMappings(
 
       // Compare the tokens to validate the mapping
       if (!tokensMatch(generatedToken, originalToken)) {
+        console.log(generatedToken, originalToken);
         throw new Error("Tokens are not equal.");
       }
     });

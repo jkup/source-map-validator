@@ -1,23 +1,22 @@
 {
   "version": 3,
-  "file": "webpack.bundle.js",
-  "mappings": "oBAEO,SAAaA,EAAIC,ICFjB,SAAaD,EAAIC,GACtBD,EAAGC,EACL,CDCEC,CAAIF,EEKH,OFJH,EEDEG,EAGE,SAAeF,GACjB,MAAM,IAAIG,MAAMH,EAClB,G",
+  "file": "rollup.bundle.js",
   "sources": [
+    "index.js",
     "foo.js",
-    "bar.js",
-    "index.js"
+    "bar.js"
   ],
   "sourcesContent": [
+    "import { foo } from './foo.js';\n\nfunction wat(fn, msg) {\n  foo(fn, msg);\n}\n\nwat(function hello(msg) {\n  throw new Error(msg);\n}, 'boop');\n",
     "import { bar } from './bar.js';\n\nexport function foo(fn, msg) {\n  bar(fn, msg);\n}\n",
-    "export function bar(fn, msg) {\n  fn(msg);\n}\n",
-    "import { foo } from './foo.js';\n\nfunction wat(fn, msg) {\n  foo(fn, msg);\n}\n\nwat(function hello(msg) {\n  throw new Error(msg);\n}, 'boop');\n"
+    "export function bar(fn, msg) {\n  fn(msg);\n}\n"
   ],
   "names": [
     "fn",
     "msg",
+    "Error",
     "bar",
-    "foo",
-    "Error"
+    "foo"
   ],
-  "sourceRoot": ""
+  "mappings": "yBAEA,IAAaA,IAIT,SAAeC,GACjB,MAAM,IAAIC,MAAMD,EAClB,ECNO,SAAaD,EAAIC,ICFjB,SAAaD,EAAIC,GACtBD,EAAGC,EACL,CDCEE,CAAIH,EAAIC,EACV,CDDEG,CAAIJ,EAKH"
 }
