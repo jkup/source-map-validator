@@ -25,6 +25,11 @@ export async function validateSourceMapMappings(
 
       // Get the tokens list for the original file
       const originalFile = originalFiles.get(mapping.source);
+
+      if (originalFile === undefined) {
+        throw new Error(`There is no content for file with the path "${mapping.source}" on a disk or in the\`sourcesContent\` section`)
+      }
+
       const originalToken = findTokenAtPosition(
         originalFile.getAst().tokens,
         mapping.originalLine,

@@ -14,14 +14,14 @@ export class TestingFile {
   public constructor(public readonly path: string) {}
 
   public getText(): string {
-    if (typeof this.text === "undefined") {
+    if (this.text === undefined) {
       this.text = fs.readFileSync(this.path, "utf8")
     }
     return this.text;
   }
 
   public getAst(): ParsingResult {
-    if (typeof this.ast === "undefined") {
+    if (this.ast === undefined) {
       this.ast = parse(this.getText(), {
         sourceType: "module",
         tokens: true,
