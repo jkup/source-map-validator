@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { TestingFile } from "./TestingFile";
+import { TestingFile } from "./TestingFile.js";
 
 export function parseSourceFiles(originalFolderPath: string) {
   const filesASTMap = new Map<string, TestingFile>();

@@ -1,8 +1,7 @@
 import assert from "node:assert";
 import { test } from "node:test";
-import path from "node:path";
 
-import validateSourceMap from "./index";
+import validateSourceMap from "./index.js";
 
 const projects = ["project1", "project2", "project3"];
 
@@ -17,10 +16,7 @@ test.describe("validateSourceMap", () => {
         "--originalFolder",
         `test-projects/${project}/original/`,
       ]);
-      assert.deepEqual(foo, {
-        result: true,
-        message: "Source map is valid.",
-      });
+      assert.deepEqual(foo, { isValid: true });
     });
   });
 });
