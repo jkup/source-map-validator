@@ -1,9 +1,8 @@
-import fs from "fs";
 import { SourceMapConsumer } from "source-map";
-import { parse } from "@babel/parser";
 import { parseSourceFiles } from "../util/parseSourceFiles";
 import { findTokenAtPosition } from "../util/findTokenAtPosition";
 import { tokensMatch } from "../util/tokensMatch";
+import { TestingFile } from "../util/TestingFile";
 
 export async function validateSourceMapMappings(
   sourceMap: any,
@@ -11,28 +10,23 @@ export async function validateSourceMapMappings(
   generatedFilePath: string
 ) {
   // Parse original files
-  const originalFilesASTs = parseSourceFiles(originalFolderPath);
-
+  const originalFiles = parseSourceFiles(originalFolderPath);
   // Parse generated file
-  const generatedCode = fs.readFileSync(generatedFilePath, "utf8");
-  const generatedAST = parse(generatedCode, {
-    sourceType: "module",
-    tokens: true,
-  });
+  const generatedFile = TestingFile.fromPath(generatedFilePath)
 
   await SourceMapConsumer.with(sourceMap, null, (consumer) => {
     consumer.eachMapping((mapping) => {
       // Get the tokens list for the generated file
       const generatedToken = findTokenAtPosition(
-        generatedAST.tokens,
+        generatedFile.getAst().tokens,
         mapping.generatedLine,
         mapping.generatedColumn
       );
 
       // Get the tokens list for the original file
-      const originalAST = originalFilesASTs.get(mapping.source);
+      const originalFile = originalFiles.get(mapping.source);
       const originalToken = findTokenAtPosition(
-        originalAST.tokens,
+        originalFile.getAst().tokens,
         mapping.originalLine,
         mapping.originalColumn
       );

@@ -1,22 +1,15 @@
 import fs from "fs";
 import path from "path";
-import { parse } from "@babel/parser";
+import { TestingFile } from "./TestingFile";
 
 export function parseSourceFiles(originalFolderPath: string) {
-  const filesASTMap = new Map();
+  const filesASTMap = new Map<string, TestingFile>();
 
   // Read all files in the folder
   const files = fs.readdirSync(originalFolderPath);
   files.forEach((file) => {
     if (path.extname(file) === ".js") {
-      // Ensure it's a JavaScript file
-      const filePath = path.join(originalFolderPath, file);
-      const fileContent = fs.readFileSync(filePath, "utf8");
-      const ast = parse(fileContent, {
-        sourceType: "module",
-        tokens: true,
-      });
-      filesASTMap.set(file, ast);
+      filesASTMap.set(file, TestingFile.fromPath(path.join(originalFolderPath, file)));
     }
   });
 
