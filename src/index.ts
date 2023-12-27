@@ -3,15 +3,13 @@
 import yargs from "yargs";
 import path from "path";
 
-import { validateSourceMapJSON } from "./validators/validateSourceMapJSON";
-import { validateSourceMapFormat } from "./validators/validateSourceMapFormat";
-import { validateSourceFiles } from "./validators/validateSourceFiles";
-import { validateSourceMapMappings } from "./validators/validateSourceMapMappings";
+import validations from "./validations.js";
+import { ValidationFail } from "./util/ValidationResult.js";
+import { ValidationContext } from "./util/ValidationContext.js";
 
-type ValidatorResult = {
-  result: boolean;
-  message: string;
-};
+type ValidatorResult =
+  | { isValid: true }
+  | { isValid: false, errors: Error[] };
 
 export default async function main(args: string[]): Promise<ValidatorResult> {
   const parser = yargs(args)
@@ -43,30 +41,12 @@ export default async function main(args: string[]): Promise<ValidatorResult> {
   const originalFolderPath = path.resolve(argv.o);
   const generatedFilePath = path.resolve(argv.g);
 
-  try {
-    const sourceMap = validateSourceMapJSON(sourceMapPath);
+  const context = ValidationContext.from(sourceMapPath, originalFolderPath, generatedFilePath)
+  const result = await validations.validate(context)
 
-    validateSourceMapFormat(sourceMap, sourceMapPath);
-    validateSourceFiles(sourceMap, originalFolderPath);
-
-    await validateSourceMapMappings(
-      sourceMap,
-      originalFolderPath,
-      generatedFilePath
-    );
-
-    console.log("Source map is valid.");
-    return {
-      result: true,
-      message: "Source map is valid.",
-    };
-  } catch (e: any) {
-    console.error(e.message);
-    return {
-      result: false,
-      message: e.message,
-    };
-  }
+  return result instanceof ValidationFail
+      ? { isValid: false, errors: result.errors }
+      : { isValid: true };
 }
 
 // Check if the script is called from the command line
@@ -78,5 +58,12 @@ const currentFileNormalized = currentFileUrl.replace(/\\/g, "/");
 const executedFileNormalized = executedFile.replace(/\\/g, "/");
 
 if (currentFileNormalized === executedFileNormalized) {
-  await main(process.argv.slice(2));
+  const result = await main(process.argv.slice(2));
+  if (result.isValid) {
+    console.log("Source map is valid.")
+    process.exit(0)
+  } else {
+    console.error(`Source map is invalid:\n${result.errors.map(x => x.message).join("\n\n")}`)
+    process.exit(1)
+  }
 }

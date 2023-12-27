@@ -1,0 +1,15 @@
+{
+  "version": 3,
+  "sources": [
+    "bar.kt",
+    "foo.kt",
+    "main.kt"
+  ],
+  "sourcesContent": [
+    null,
+    null,
+    null
+  ],
+  "names": [],
+  "mappings": "qkEAGC,EAAG,EAAH,E,qBAAO,C,GCAH,EAAI,EAAR,EAAY,C,GCAR,EAAI,EAAR,EAAY,C,GAEG,SAAQ,IAAZ,EAEZ,C,8BADO,EAAsB,EAAtB,EAAN,E"
+}
