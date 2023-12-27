@@ -1,4 +1,4 @@
 package original
 
-fun foo(fn: (Int) -> Unit, signal: Int) =
-  bar(fn, signal)
+fun foo(fn: (String) -> Unit, msg: String) =
+  bar(fn, msg)

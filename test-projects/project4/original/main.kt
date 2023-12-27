@@ -1,6 +1,8 @@
 package original
 
-fun wat(signal: Int, fn: (Int) -> Unit) =
-  foo(fn, signal)
+fun wat(msg: String, fn: (String) -> Unit) =
+  foo(fn, msg)
 
-fun main() = wat(42) { }
+fun main() = wat("boop") {
+  throw IllegalStateException(it)
+}
