@@ -7,7 +7,7 @@ const projects = ["project1", "project2", "project3"];
 
 test.describe("validateSourceMap", () => {
   projects.forEach((project) => {
-    test(`should return a valid result when given a valid source map for ${project}`, async () => {
+    test(`should return a valid result when given a valid source map for js project with name "${project}"`, async () => {
       const foo = await validateSourceMap([
         "--sourceMap",
         `test-projects/${project}/${project}.js.map`,
@@ -18,5 +18,16 @@ test.describe("validateSourceMap", () => {
       ]);
       assert.deepEqual(foo, { isValid: true });
     });
+  });
+  test(`should return a valid result when given a valid source map for wasm project with name "project4"`, async () => {
+    const foo = await validateSourceMap([
+      "--sourceMap",
+      `test-projects/project4/project4.generated.wasm.map`,
+      "--generatedFile",
+      `test-projects/project4/project4.generated.wasm`,
+      "--originalFolder",
+      `test-projects/project4/original/`,
+    ]);
+    assert.deepEqual(foo, { isValid: true });
   });
 });

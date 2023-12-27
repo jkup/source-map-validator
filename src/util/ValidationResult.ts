@@ -7,7 +7,7 @@ export abstract class ValidationResult {
 export class ValidationSuccess {
     private static INSTANCE = new ValidationSuccess();
 
-    public static create() {
+    static create() {
         return this.INSTANCE;
     }
 
@@ -15,7 +15,7 @@ export class ValidationSuccess {
 }
 
 export class ValidationFail {
-    public static from(errors: Error[]) {
+    static from(errors: Error[]) {
         return new ValidationFail(errors);
     }
 

@@ -1,17 +1,13 @@
-import fs from "fs";
 import path from "path";
 import { TestingFile } from "./TestingFile.js";
+import type { SourceMap } from "./sourceMap.js";
 
-export function parseSourceFiles(originalFolderPath: string) {
-  const filesASTMap = new Map<string, TestingFile>();
+export function parseSourceFiles(sourceMap: SourceMap, originalFolderPath: string) {
+  const filesMap = new Map<string, TestingFile>();
 
-  // Read all files in the folder
-  const files = fs.readdirSync(originalFolderPath);
-  files.forEach((file) => {
-    if (path.extname(file) === ".js") {
-      filesASTMap.set(file, TestingFile.fromPath(path.join(originalFolderPath, file)));
-    }
+  sourceMap.sources.forEach((file: string, index: number) => {
+    filesMap.set(file, TestingFile.forTextFile(path.join(originalFolderPath, file), sourceMap.sourcesContent[index]))
   });
 
-  return filesASTMap;
+  return filesMap;
 }

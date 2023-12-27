@@ -1,8 +1,5 @@
 import { MappingItem, SourceMapConsumer } from "source-map";
-import { Token } from "../util/token.js";
 import { parseSourceFiles } from "../util/parseSourceFiles.js";
-import { findTokenAtPosition } from "../util/findTokenAtPosition.js";
-import { tokensMatch } from "../util/tokensMatch.js";
 import { TestingFile } from "../util/TestingFile.js";
 import { Validator } from "../util/Validator.js";
 import { ValidationResult } from "../util/ValidationResult.js";
@@ -11,20 +8,13 @@ import type { ValidationContext } from "../util/ValidationContext.js";
 export class SourceMapMappingsValidator extends Validator {
   async validate({ sourceMap, originalFolderPath, generatedFilePath }: ValidationContext): Promise<ValidationResult> {
     const errors: Error[] = [];
-    const originalFiles = parseSourceFiles(originalFolderPath);
-    // Parse generated file
-    const generatedFile = TestingFile.fromPath(generatedFilePath)
+    const originalFiles = parseSourceFiles(sourceMap, originalFolderPath);
+    const generatedFile = TestingFile.fromPathBasedOnFileExtension(generatedFilePath);
 
     await SourceMapConsumer.with(sourceMap, null, (consumer) => {
       consumer.eachMapping((mapping) => {
-        // Get the tokens list for the generated file
-        const generatedToken = findTokenAtPosition(
-            generatedFile.getAst().tokens,
-            mapping.generatedLine,
-            mapping.generatedColumn
-        );
-
-        // Get the tokens list for the original file
+        // Is this a valid situation following the spec?
+        if (mapping.source === null) return
         const originalFile = originalFiles.get(mapping.source);
 
         if (originalFile === undefined) {
@@ -32,15 +22,13 @@ export class SourceMapMappingsValidator extends Validator {
           return
         }
 
-        const originalToken = findTokenAtPosition(
-            originalFile.getAst().tokens,
-            mapping.originalLine,
-            mapping.originalColumn
-        );
+        const notReasonableMappingMessage = this.formatWeirdMappingMessage(mapping, originalFile, generatedFile)
 
-        // Compare the tokens to validate the mapping
-        if (!tokensMatch(generatedToken, originalToken)) {
-          errors.push(new Error(this.formatDifferentTokenMessage(mapping, originalFile, generatedFile, originalToken, generatedToken)));
+        if (!originalFile.isMappingReasonable(mapping.originalLine, mapping.originalColumn)) {
+            errors.push(new Error(`${notReasonableMappingMessage} from the original file perspective`))
+        }
+        if (!generatedFile.isMappingReasonable(mapping.generatedLine, mapping.generatedColumn)) {
+          errors.push(new Error(`${notReasonableMappingMessage} from the generated file perspective`))
         }
       });
     });
@@ -48,17 +36,7 @@ export class SourceMapMappingsValidator extends Validator {
     return ValidationResult.from(errors);
   }
 
-  private formatDifferentTokenMessage(
-      mapping: MappingItem,
-      originalFile: TestingFile,
-      generatedFile: TestingFile,
-      originalToken: Token | null,
-      generatedToken: Token | null,
-  ) {
-    return ` 
-Tokens in ${originalFile.path} (${mapping.originalLine}:${mapping.originalColumn}) and in ${generatedFile.path} (${mapping.generatedLine}:${mapping.generatedColumn}) are not equal.
-* Original token is: ${originalToken?.type?.label}
-* Generated token is: ${generatedToken?.type?.label}
-    `.trim();
+  private formatWeirdMappingMessage(mapping: MappingItem, originalFile: TestingFile, generatedFile: TestingFile): string {
+    return `Mapping from "${originalFile.path} (${mapping.originalLine}:${mapping.originalColumn})" to "${generatedFile.path} (${mapping.generatedLine}:${mapping.generatedColumn})" looks not reasonable`
   }
 }
