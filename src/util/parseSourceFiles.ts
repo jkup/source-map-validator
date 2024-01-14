@@ -1,24 +1,13 @@
-import fs from "fs";
 import path from "path";
-import { parse } from "@babel/parser";
+import { TestingFile } from "./TestingFile.js";
+import type { SourceMap } from "./sourceMap.js";
 
-export function parseSourceFiles(originalFolderPath: string) {
-  const filesASTMap = new Map();
+export function parseSourceFiles(sourceMap: SourceMap, originalFolderPath: string) {
+  const filesMap = new Map<string, TestingFile>();
 
-  // Read all files in the folder
-  const files = fs.readdirSync(originalFolderPath);
-  files.forEach((file) => {
-    if (path.extname(file) === ".js") {
-      // Ensure it's a JavaScript file
-      const filePath = path.join(originalFolderPath, file);
-      const fileContent = fs.readFileSync(filePath, "utf8");
-      const ast = parse(fileContent, {
-        sourceType: "module",
-        tokens: true,
-      });
-      filesASTMap.set(file, ast);
-    }
+  sourceMap.sources.forEach((file: string, index: number) => {
+    filesMap.set(file, TestingFile.forTextFile(path.join(originalFolderPath, file), sourceMap.sourcesContent[index]))
   });
 
-  return filesASTMap;
+  return filesMap;
 }
