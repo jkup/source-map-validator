@@ -1,0 +1,9 @@
+{
+  "version": 3,
+  "sources": ["one.js", "two.js"],
+  "sourcesContent": [null, null],
+  "names": ["f", "num", "increment", "x", "o", "l", "e"],
+  "mappings": ";;;;;",
+  "originalScopes": ["AACAAC,GmB", "AACAEA,CqBECAG,EC,AC"],
+  "generatedRanges": ",ACCAADI,AKCCAKD;;AKGACAEAM;;qB;iB,A"
+}

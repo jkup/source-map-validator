@@ -47,7 +47,7 @@ export class SourceMapScopesValidator extends Validator {
     }
 
     try {
-      decodedGeneratedRanges = decodeGeneratedScopes(generatedRanges, sourceMap.names ?? [], originalScopes);
+      decodedGeneratedRanges = decodeGeneratedScopes(generatedRanges, sourceMap.names ?? [], decodedOriginalScopes);
     } catch (e: any) {
       errors.push(e);
       return ValidationResult.from(errors);
@@ -92,11 +92,12 @@ export class SourceMapScopesValidator extends Validator {
       return;
     }
 
-    if (!originalFile.isMappingReasonable(originalScope.start.line, originalScope.start.column)) {
+    // TODO: Examples inside the scope proposal have zero-based line numbers, but the source maps themself have one-based line numbers
+    if (!originalFile.isMappingReasonable(originalScope.start.line + 1, originalScope.start.column)) {
       const notReasonableScopeMessage = this.formatWeirdOriginalScopeMessage(originalScope.start, originalFile);
       errors.push(new Error(`Start of the ${notReasonableScopeMessage}`));
     }
-    if (!originalFile.isMappingReasonable(originalScope.end.line, originalScope.end.line)) {
+    if (!originalFile.isMappingReasonable(originalScope.end.line + 1, originalScope.end.column)) {
       const notReasonableScopeMessage = this.formatWeirdOriginalScopeMessage(originalScope.end, originalFile)
       errors.push(new Error(`End of the ${notReasonableScopeMessage}`));
     }
@@ -118,11 +119,11 @@ export class SourceMapScopesValidator extends Validator {
       originalFiles: Map<string, TestingFile>,
       generatedFile: TestingFile
   ) {
-    if (!generatedFile.isMappingReasonable(generatedRange.start.line, generatedRange.start.column)) {
+    if (!generatedFile.isMappingReasonable(generatedRange.start.line + 1, generatedRange.start.column)) {
       errors.push(new Error(`Start of the generated range (${path}) looks not reasonable (${generatedRange.start.line}:${generatedRange.start.column})`));
     }
-    if (!generatedFile.isMappingReasonable(generatedRange.end.line, generatedRange.end.line)) {
-      errors.push(new Error(`End of the generated range (${path}) looks not reasonable (${generatedRange.start.line}:${generatedRange.start.column})`));
+    if (!generatedFile.isMappingReasonable(generatedRange.end.line + 1, generatedRange.end.column)) {
+      errors.push(new Error(`End of the generated range (${path}) looks not reasonable (${generatedRange.end.line}:${generatedRange.end.column})`));
     }
 
     const original = generatedRange.original;
@@ -146,7 +147,7 @@ export class SourceMapScopesValidator extends Validator {
           return;
         }
 
-        if (!originalFile.isMappingReasonable(callsite.line, callsite.column)) {
+        if (!originalFile.isMappingReasonable(callsite.line + 1, callsite.column)) {
           errors.push(new Error(`Callsite in the generated range (${path}) in "${originalFile.path} (${callsite.line}:${callsite.column})" looks not reasonable`));
         }
       }
@@ -156,7 +157,7 @@ export class SourceMapScopesValidator extends Validator {
           if (Array.isArray(segment)) {
             const [location] = segment;
 
-            if (!generatedFile.isMappingReasonable(location.line, location.line)) {
+            if (!generatedFile.isMappingReasonable(location.line + 1, location.column)) {
               errors.push(new Error(`Multi value segment ${segmentIndex}, in value binding with index ${index} of the generated range (${path}) contains unreasonable location to the generated file (${location.line}:${location.column})`));
             }
           }
