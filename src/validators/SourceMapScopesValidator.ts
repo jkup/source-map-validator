@@ -10,7 +10,7 @@ import type { OriginalLocation, GeneratedScope, Location, OriginalScope, ScopeKi
 export class SourceMapScopesValidator extends Validator {
   private readonly scopeKindsWithName = new Set<ScopeKind>(["module", "function", "class"]);
 
-  async validate({ sourceMap, originalFolderPath, generatedFilePath }: ValidationContext): Promise<ValidationResult> {
+  validate({ sourceMap, originalFolderPath, generatedFilePath }: ValidationContext): ValidationResult {
     if (!sourceMap.hasOwnProperty("originalScopes") && !sourceMap.hasOwnProperty("generatedRanges")) {
       return ValidationSuccess.create();
     }
@@ -41,17 +41,17 @@ export class SourceMapScopesValidator extends Validator {
 
     try {
       decodedOriginalScopes = decodeOriginalScopes(originalScopes, sourceMap.names ?? []);
-    } catch (e) {
-      errors.push(e)
+    } catch (e: any) {
+      errors.push(e);
+      return ValidationResult.from(errors);
     }
 
     try {
       decodedGeneratedRanges = decodeGeneratedScopes(generatedRanges, sourceMap.names ?? [], originalScopes);
-    } catch (e) {
-      errors.push(e)
+    } catch (e: any) {
+      errors.push(e);
+      return ValidationResult.from(errors);
     }
-
-    if (errors.length !== 0) return ValidationResult.from(errors);
 
     const originalFiles = collectSourceFiles(sourceMap, originalFolderPath);
     const generatedFile = TestingFile.fromPathBasedOnFileExtension(generatedFilePath);
@@ -61,6 +61,8 @@ export class SourceMapScopesValidator extends Validator {
     });
 
     this.validateGeneratedRange("generatedRange", decodedGeneratedRanges, errors, sourceMap, originalFiles, generatedFile);
+
+    return ValidationResult.from(errors);
   }
 
   private validateOriginalScope(
@@ -150,13 +152,15 @@ export class SourceMapScopesValidator extends Validator {
       }
 
       values.forEach((value, index) => {
-        if (Array.isArray(value)) {
-          const [location] = value as [Location, string | undefined];
+        value.forEach((segment, segmentIndex) => {
+          if (Array.isArray(segment)) {
+            const [location] = segment;
 
-          if (!generatedFile.isMappingReasonable(location.line, location.line)) {
-            errors.push(new Error(`Value binding with index ${index} of the generated range (${path}) contains unreasonable location to the generated file (${location.line}:${location.column})`));
+            if (!generatedFile.isMappingReasonable(location.line, location.line)) {
+              errors.push(new Error(`Multi value segment ${segmentIndex}, in value binding with index ${index} of the generated range (${path}) contains unreasonable location to the generated file (${location.line}:${location.column})`));
+            }
           }
-        }
+        })
       });
     }
 
