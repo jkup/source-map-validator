@@ -4,6 +4,7 @@ import { SourceFilesValidator } from "./validators/SourceFilesValidator.js";
 import { SourceMapJSONValidator } from "./validators/SourceMapJSONValidator.js";
 import { SourceMapFormatValidator } from "./validators/SourceMapFormatValidator.js";
 import { SourceMapMappingsValidator } from "./validators/SourceMapMappingsValidator.js";
+import {SourceMapScopesValidator} from "./validators/SourceMapScopesValidator.js";
 
 const sourceMapJSONValidation = validation({
     validator: SourceMapJSONValidator,
@@ -30,12 +31,19 @@ const sourceMapMappingsValidation = validation({
     name: "SourceMapMappingsValidator",
     description: "Check that `mappings` field contains correctly encoded segments that map tokens with the same type",
     prerequisites: [sourceMapJSONValidation, sourceMapFormatValidation, sourceFilesValidation]
+})
 
+const sourceMapScopesValidation = validation({
+    validator: SourceMapScopesValidator,
+    name: "SourceMapScopesValidator",
+    description: "Check that `originalScopes` and `generatedRanges` fields contain correctly encoded segments",
+    prerequisites: [sourceMapJSONValidation, sourceMapFormatValidation, sourceFilesValidation]
 })
 
 export default compose(
     sourceMapJSONValidation,
     sourceMapFormatValidation,
     sourceFilesValidation,
-    sourceMapMappingsValidation
+    sourceMapMappingsValidation,
+    sourceMapScopesValidation
 )

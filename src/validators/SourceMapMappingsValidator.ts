@@ -1,5 +1,5 @@
 import { MappingItem, SourceMapConsumer } from "source-map";
-import { parseSourceFiles } from "../util/parseSourceFiles.js";
+import { collectSourceFiles } from "../util/collectSourceFiles.js";
 import { TestingFile } from "../util/TestingFile.js";
 import { Validator } from "../util/Validator.js";
 import { ValidationResult } from "../util/ValidationResult.js";
@@ -8,7 +8,7 @@ import type { ValidationContext } from "../util/ValidationContext.js";
 export class SourceMapMappingsValidator extends Validator {
   async validate({ sourceMap, originalFolderPath, generatedFilePath }: ValidationContext): Promise<ValidationResult> {
     const errors: Error[] = [];
-    const originalFiles = parseSourceFiles(sourceMap, originalFolderPath);
+    const originalFiles = collectSourceFiles(sourceMap, originalFolderPath);
     const generatedFile = TestingFile.fromPathBasedOnFileExtension(generatedFilePath);
 
     await SourceMapConsumer.with(sourceMap, null, (consumer) => {
