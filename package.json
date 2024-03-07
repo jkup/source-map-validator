@@ -27,7 +27,9 @@
   "dependencies": {
     "@babel/parser": "^7.23.3",
     "@babel/traverse": "^7.23.3",
+    "scope-mapping": "github:JSMonk/tc39-proposal-scope-mapping#main",
     "source-map": "^0.7.4",
+    "vlq": "^2.0.4",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

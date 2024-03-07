@@ -13,7 +13,7 @@ export class SourceMapJSONValidator extends Validator {
       // Read file contents
       const sourceMapContent = fs.readFileSync(context.sourceMapPath, "utf8");
       // Parse JSON
-      context.sourceMap = JSON.parse(sourceMapContent);;
+      context.sourceMap = JSON.parse(sourceMapContent);
     } catch (e: any) {
       errors.push(e.message)
     }

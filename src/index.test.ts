@@ -3,7 +3,7 @@ import { test } from "node:test";
 
 import validateSourceMap from "./index.js";
 
-const projects = ["project1", "project2", "project3"];
+const projects = ["project1", "project2", "project3", "project5"];
 
 test.describe("validateSourceMap", () => {
   projects.forEach((project) => {
