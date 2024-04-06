@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc --project ./tsconfig.json",
-    "start": "npm run buid && node dist/index.js",
+    "start": "npm run build && node dist/index.js",
     "test": "npm run build && node --test"
   },
   "repository": {
