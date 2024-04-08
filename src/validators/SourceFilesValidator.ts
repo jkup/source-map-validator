@@ -10,10 +10,10 @@ export class SourceFilesValidator extends Validator {
     const { sources, sourcesContent = [] } = context.sourceMap
 
     function check(sources : any) {
-      sources.forEach((sourceFileName: string, index: number) => {
-        const fullPath = path.join(context.originalFolderPath, sourceFileName);
-        if (!fs.existsSync(fullPath) && sourcesContent[index] == undefined) {
-          errors.push(new Error(`Source file not found: ${sourceFileName}`));
+      sources.forEach((sourceFileName: string | null, index: number) => {
+        const fullPath = sourceFileName === null ? null : path.join(context.originalFolderPath, sourceFileName);
+        if ((!fullPath || !fs.existsSync(fullPath)) && sourcesContent[index] == undefined) {
+          errors.push(new Error(`Source file not found: ${sourceFileName} ${sourcesContent[index]}`));
         }
       });
     };

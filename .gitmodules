@@ -1,0 +1,3 @@
+[submodule "source-map-tests"]
+	path = source-map-tests
+	url = https://github.com/takikawa/source-map-tests.git
