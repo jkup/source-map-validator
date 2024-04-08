@@ -18,7 +18,7 @@ export class SourceMapFormatValidator extends Validator {
       })
     }
 
-    if (!sourceMap.mappings) {
+    if (!("mappings" in sourceMap)) {
       errors.push(new Error('Source map "mappings" field is missing.'));
     }
 
