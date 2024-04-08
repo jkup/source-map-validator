@@ -6,7 +6,7 @@ export function collectSourceFiles(sourceMap: SourceMap, originalFolderPath: str
   const filesMap = new Map<string, TestingFile>();
 
   sourceMap.sources.forEach((file: string, index: number) => {
-    filesMap.set(file, TestingFile.forTextFile(path.join(originalFolderPath, file), sourceMap.sourcesContent[index]))
+    filesMap.set(file, TestingFile.forTextFile(path.join(originalFolderPath, file), sourceMap.sourcesContent ? sourceMap.sourcesContent[index] : null))
   });
 
   return filesMap;
