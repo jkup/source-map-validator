@@ -8,8 +8,16 @@ import type { ValidationContext } from "../util/ValidationContext.js";
 export class SourceMapMappingsValidator extends Validator {
   async validate({ sourceMap, originalFolderPath, generatedFilePath }: ValidationContext): Promise<ValidationResult> {
     const errors: Error[] = [];
-    const originalFiles = collectSourceFiles(sourceMap, originalFolderPath);
     const generatedFile = TestingFile.fromPathBasedOnFileExtension(generatedFilePath);
+
+    let originalFiles = new Map<string, TestingFile>();
+    if (sourceMap.sections) {
+      for (let section of sourceMap.sections) {
+        const newOriginalFiles = collectSourceFiles(section.map, originalFolderPath);
+        originalFiles = new Map([...originalFiles, ...newOriginalFiles]);
+      }
+    } else
+      originalFiles = collectSourceFiles(sourceMap, originalFolderPath);
 
     try {
       await SourceMapConsumer.with(sourceMap, null, (consumer) => {

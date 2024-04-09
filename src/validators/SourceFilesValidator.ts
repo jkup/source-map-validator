@@ -9,12 +9,22 @@ export class SourceFilesValidator extends Validator {
     const errors: Error[] = [];
     const { sources, sourcesContent = [] } = context.sourceMap
 
-    sources.forEach((sourceFileName: string, index: number) => {
-      const fullPath = path.join(context.originalFolderPath, sourceFileName);
-      if (!fs.existsSync(fullPath) && sourcesContent[index] == undefined) {
-        errors.push(new Error(`Source file not found: ${sourceFileName}`));
-      }
-    });
+    function check(sources : any) {
+      sources.forEach((sourceFileName: string, index: number) => {
+        const fullPath = path.join(context.originalFolderPath, sourceFileName);
+        if (!fs.existsSync(fullPath) && sourcesContent[index] == undefined) {
+          errors.push(new Error(`Source file not found: ${sourceFileName}`));
+        }
+      });
+    };
+
+    if ("sections" in context.sourceMap) {
+      context.sourceMap.sections.forEach((section : any) => {
+        check(section.map.sources);
+      });
+    } else {
+      check(sources);
+    }
 
     return ValidationResult.from(errors)
   }
