@@ -27,6 +27,14 @@ export class SourceMapFormatValidator extends Validator {
         })
       }
 
+      if (!sourceMap.names || !Array.isArray(sourceMap.names)) {
+        errors.push(new Error('Source map "names" field is missing.'));
+      } else {
+        sourceMap.names.forEach((x: unknown, i: number) => {
+          if (typeof x !== "string") errors.push(new Error(`There is a name with an invalid format on the index ${i}. Each name should be defined as a string`))
+        })
+      }
+
       if (!("mappings" in sourceMap)) {
         errors.push(new Error('Source map "mappings" field is missing.'));
       } else if (typeof sourceMap.mappings !== "string") {
