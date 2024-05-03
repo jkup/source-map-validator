@@ -2,10 +2,10 @@ import { Validator } from "../util/Validator.js";
 import { TestingFile } from "../util/TestingFile.js";
 import { collectSourceFiles } from "../util/collectSourceFiles.js";
 import { ValidationResult, ValidationSuccess } from "../util/ValidationResult.js";
-import { decodeOriginalScopes, decodeGeneratedScopes } from "scope-mapping";
+import { decodeOriginalScopes, decodeGeneratedRanges } from "tc39-proposal-scope-mapping";
 import type { SourceMap } from "../util/sourceMap.js";
 import type { ValidationContext } from "../util/ValidationContext.js";
-import type { OriginalLocation, GeneratedScope, Location, OriginalScope, ScopeKind } from "scope-mapping";
+import type { OriginalLocation, GeneratedRange, OriginalScope, ScopeKind } from "tc39-proposal-scope-mapping";
 
 export class SourceMapScopesValidator extends Validator {
   private readonly scopeKindsWithName = new Set<ScopeKind>(["module", "function", "class"]);
@@ -19,7 +19,7 @@ export class SourceMapScopesValidator extends Validator {
     const { originalScopes, generatedRanges } = sourceMap;
 
     if (!Array.isArray(originalScopes)) {
-      errors.push(new Error(`Source map "originalScopes" has a wrong type. Expected array of strings, but it's ${originalScopes?.constructor?.name?.toLowerCase()}`));
+      errors.push(new Error(`Source map "originalScopes" has a wrong type. Expected array of strings, but it's ${(originalScopes as object)?.constructor?.name?.toLowerCase()}`));
     } else {
       originalScopes.forEach((encodedScope, index) => {
         const encodedScopeType = typeof encodedScope;
@@ -37,7 +37,7 @@ export class SourceMapScopesValidator extends Validator {
     if (errors.length !== 0) return ValidationResult.from(errors);
 
     let decodedOriginalScopes: OriginalScope[];
-    let decodedGeneratedRanges: GeneratedScope;
+    let decodedGeneratedRanges: GeneratedRange;
 
     try {
       decodedOriginalScopes = decodeOriginalScopes(originalScopes, sourceMap.names ?? []);
@@ -47,7 +47,7 @@ export class SourceMapScopesValidator extends Validator {
     }
 
     try {
-      decodedGeneratedRanges = decodeGeneratedScopes(generatedRanges, sourceMap.names ?? [], decodedOriginalScopes);
+      decodedGeneratedRanges = decodeGeneratedRanges(generatedRanges, sourceMap.names ?? [], decodedOriginalScopes);
     } catch (e: any) {
       errors.push(e);
       return ValidationResult.from(errors);
@@ -113,7 +113,7 @@ export class SourceMapScopesValidator extends Validator {
 
   private validateGeneratedRange(
       path: string,
-      generatedRange: GeneratedScope,
+      generatedRange: GeneratedRange,
       errors: Error[],
       sourceMap: SourceMap,
       originalFiles: Map<string, TestingFile>,
@@ -129,7 +129,7 @@ export class SourceMapScopesValidator extends Validator {
     const original = generatedRange.original;
 
     if (original !== undefined) {
-      const { callsite, values, scope }  = original;
+      const { callsite, bindings, scope }  = original;
 
       if (callsite !== undefined) {
         const sourceIndex = callsite.sourceIndex;
@@ -152,16 +152,21 @@ export class SourceMapScopesValidator extends Validator {
         }
       }
 
-      values.forEach((value, index) => {
-        value.forEach((segment, segmentIndex) => {
-          if (Array.isArray(segment)) {
-            const [location] = segment;
+      bindings?.forEach((value, index) => {
+        if (typeof value === "string" || value === undefined) return
+        if (Array.isArray(value)) {
+          value.forEach((segment, segmentIndex) => {
+            if (Array.isArray(segment)) {
+              const [location] = segment;
 
-            if (!generatedFile.isMappingReasonable(location.line + 1, location.column)) {
-              errors.push(new Error(`Multi value segment ${segmentIndex}, in value binding with index ${index} of the generated range (${path}) contains unreasonable location to the generated file (${location.line}:${location.column})`));
+              if (!generatedFile.isMappingReasonable(location.line + 1, location.column)) {
+                errors.push(new Error(`Multi value segment ${segmentIndex}, in value binding with index ${index} of the generated range (${path}) contains unreasonable location to the generated file (${location.line}:${location.column})`));
+              }
             }
-          }
-        })
+          })
+        }
+
+        errors.push(new Error(`Unexpected binding type (${typeof value}) on index ${index}`));
       });
     }
 
