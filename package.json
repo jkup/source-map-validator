@@ -28,7 +28,7 @@
     "@babel/parser": "^7.23.3",
     "@babel/traverse": "^7.23.3",
     "tc39-proposal-scope-mapping": "^0.1.1",
-    "source-map": "^0.7.4",
+    "source-map": "^0.8.0-beta.0",
     "vlq": "^2.0.4",
     "yargs": "^17.7.2"
   },
