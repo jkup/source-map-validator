@@ -3,6 +3,9 @@
 
 name: Node.js CI
 
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 on:
   push:
     branches: [ "main" ]
