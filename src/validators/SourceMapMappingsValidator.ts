@@ -23,7 +23,7 @@ export class SourceMapMappingsValidator extends Validator {
       await SourceMapConsumer.with(sourceMap, null, (consumer) => {
         consumer.eachMapping((mapping) => {
           // Is this a valid situation following the spec?
-          if (mapping.source === null) return
+          if (mapping.source === null || mapping.source === "null") return
           const originalFile = originalFiles.get(mapping.source);
 
           if (originalFile === undefined) {
