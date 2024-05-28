@@ -60,6 +60,27 @@ function validateSourceMap(sourceMap : any) : Error[] {
         if (x !== null && typeof x !== "string") errors.push(new Error(`There is a source content with an invalid format on the index ${i}. Each content should be defined as a strings or null`))
       })
     }
+
+    if ("ignoreList" in sourceMap) {
+      if (!Array.isArray(sourceMap.ignoreList))
+        errors.push(new Error('Source map "ignoreList" field is invalid.'));
+      else {
+        sourceMap.ignoreList.forEach((x: unknown, i: number) => {
+          if (!Number.isInteger(x))
+            errors.push(
+              new Error(
+                `There is an ignoreList entry with an invalid format at the index ${i}. Each content should be defined as a number`,
+              ),
+            );
+          if ((x as number) >= sourceMap.sources.length || (x as number) < 0)
+            errors.push(
+              new Error(
+                `There is an ignoreList entry at index ${i} with an out-of-bounds value ${x}.`,
+              ),
+            );
+        });
+      }
+    }
   }
 
   return errors;
