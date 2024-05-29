@@ -55,7 +55,7 @@ function validateSourceMap(sourceMap : any) : Error[] {
 
     if ('sourcesContent' in sourceMap) {
       if (!Array.isArray(sourceMap.sourcesContent))
-        errors.push(new Error('Source map "sources" field is invalid.'));
+        errors.push(new Error('Source map "sourcesContent" field is invalid.'));
       sourceMap.sourcesContent.forEach((x: unknown, i: number) => {
         if (x !== null && typeof x !== "string") errors.push(new Error(`There is a source content with an invalid format on the index ${i}. Each content should be defined as a strings or null`))
       })
