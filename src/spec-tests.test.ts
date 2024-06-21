@@ -19,11 +19,6 @@ const skippedTests = [
   "validMappingFieldsWith32BitMaxValues",
   // Source maps library errors on this.
   "validMappingLargeVLQ",
-  // Ignore list unsupported for now.
-  "ignoreListWrongType1",
-  "ignoreListWrongType2",
-  "ignoreListWrongType3",
-  "ignoreListOutOfBounds",
 ];
 
 test.describe("runSourceMapSpecTests", () => {
