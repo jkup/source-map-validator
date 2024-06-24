@@ -16,7 +16,7 @@ test.describe("validateSourceMap", () => {
         "--originalFolder",
         `test-projects/${project}/original/`,
       ]);
-      assert.deepEqual(foo, { isValid: true });
+      assert.deepEqual(foo, { isValid: true, errors: [] });
     });
   });
   test(`should return a valid result when given a valid source map for wasm project with name "project4"`, async () => {
@@ -28,6 +28,6 @@ test.describe("validateSourceMap", () => {
       "--originalFolder",
       `test-projects/project4/original/`,
     ]);
-    assert.deepEqual(foo, { isValid: true });
+    assert.deepEqual(foo, { isValid: true, errors: [] });
   });
 });

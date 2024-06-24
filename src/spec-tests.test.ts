@@ -44,7 +44,7 @@ test.describe("runSourceMapSpecTests", () => {
       if (testCase.sourceMapIsValid)
         assert.deepEqual(
           result,
-          { isValid: true },
+          { isValid: true, errors: [] },
           "expected source map to be valid"
         );
       else
