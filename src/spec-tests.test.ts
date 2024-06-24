@@ -1,13 +1,16 @@
 import assert from "node:assert";
 import path from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from "node:url";
 
 import validateSourceMap from "./index.js";
 import sourceMapSpecTests from "../source-map-tests/source-map-spec-tests.json" assert { type: "json" };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const specResourcesBaseDir = path.resolve(__dirname, "../../source-map-tests/resources");
+const specResourcesBaseDir = path.resolve(
+  __dirname,
+  "../../source-map-tests/resources"
+);
 
 // These tests are known failures that aren't easily fixed at the moment.
 const skippedTests = [
@@ -23,7 +26,9 @@ const skippedTests = [
 
 test.describe("runSourceMapSpecTests", () => {
   sourceMapSpecTests.tests.forEach((testCase) => {
-    test(`The source map spec test case "${testCase.name}" has ${testCase.sourceMapIsValid ? "a valid" : "an invalid"} source map`, async (t) => {
+    test(`The source map spec test case "${testCase.name}" has ${
+      testCase.sourceMapIsValid ? "a valid" : "an invalid"
+    } source map`, async (t) => {
       if (skippedTests.includes(testCase.name)) {
         t.skip();
         return;
@@ -37,9 +42,17 @@ test.describe("runSourceMapSpecTests", () => {
         `${specResourcesBaseDir}`,
       ]);
       if (testCase.sourceMapIsValid)
-        assert.deepEqual(result, { isValid: true }, "expected source map to be valid");
+        assert.deepEqual(
+          result,
+          { isValid: true, errors: [] },
+          "expected source map to be valid"
+        );
       else
-        assert.equal(result.isValid, false, "expected source map to be invalid");
+        assert.equal(
+          result.isValid,
+          false,
+          "expected source map to be invalid"
+        );
     });
   });
 });
