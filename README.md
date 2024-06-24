@@ -24,6 +24,15 @@ npx [todo-name-tool] --sourceMap sourcemap.js.map --generatedFile generated.js -
 
 ## How the Project Works
 
+### Contributing
+
+1. Clone the repo
+1. Run `npm install`
+1. Run `git submodule init`
+1. Run `git submodule update`
+
+From there, you can run tests with `npm test` or make a build with `npm run build`.
+
 ### Validators
 
 The project uses a series of validators to check the integrity of source maps:
