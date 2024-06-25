@@ -2,15 +2,16 @@ import { Validator } from "../util/Validator.js";
 import { TestingFile } from "../util/TestingFile.js";
 import { collectSourceFiles } from "../util/collectSourceFiles.js";
 import { ValidationResult, ValidationSuccess } from "../util/ValidationResult.js";
-import { decodeOriginalScopes, decodeGeneratedRanges } from "tc39-proposal-scope-mapping";
+import { decodeOriginalScopes, decodeGeneratedRanges, getOriginalScopeChain, getGeneratedRangeChain } from "tc39-proposal-scope-mapping";
+import { SourceMapConsumer } from "source-map";
 import type { SourceMap } from "../util/sourceMap.js";
 import type { ValidationContext } from "../util/ValidationContext.js";
-import type { OriginalLocation, GeneratedRange, OriginalScope, ScopeKind } from "tc39-proposal-scope-mapping";
+import type { OriginalLocation, GeneratedRange, OriginalScope, ScopeKind, Location } from "tc39-proposal-scope-mapping";
 
 export class SourceMapScopesValidator extends Validator {
   private readonly scopeKindsWithName = new Set<ScopeKind>(["module", "function", "class"]);
 
-  validate({ sourceMap, originalFolderPath, generatedFilePath }: ValidationContext): ValidationResult {
+  async validate({ sourceMap, originalFolderPath, generatedFilePath }: ValidationContext): Promise<ValidationResult> {
     if (!sourceMap.hasOwnProperty("originalScopes") && !sourceMap.hasOwnProperty("generatedRanges")) {
       return ValidationSuccess.create();
     }
@@ -62,6 +63,8 @@ export class SourceMapScopesValidator extends Validator {
 
     this.validateGeneratedRange("generatedRange", decodedGeneratedRanges, errors, sourceMap, originalFiles, generatedFile);
 
+    await this.validateMappingConsistency(originalScopes, generatedRanges, errors, sourceMap);
+
     return ValidationResult.from(errors);
   }
 
@@ -104,6 +107,23 @@ export class SourceMapScopesValidator extends Validator {
 
     if (originalScope.name !== undefined && !this.scopeKindsWithName.has(originalScope.kind)) {
       errors.push(new Error(`The scope (path) has a name property, but its kind is '${originalScope.kind}'. Only the next scope kinds are allowed to have the name property: ${Array.from(this.scopeKindsWithName).join(', ')}`));
+    }
+
+    if (this.isLocationBefore(originalScope.end, originalScope.start)) {
+      errors.push(new Error(`The original scope's end location is before its start location (${path})`));
+    }
+    if (originalScope.children?.length) {
+      if (this.isLocationBefore(originalScope.children[0].start, originalScope.start)) {
+        errors.push(new Error(`The original scope's start location is outside of its parent (${path})`));
+      }
+      if (this.isLocationBefore(originalScope.end, originalScope.children[originalScope.children.length - 1].end)) {
+        errors.push(new Error(`The original scope's end location is outside of its parent (${path})`));
+      }
+      for (let i = 0; i < originalScope.children.length - 1; i++) {
+        if (this.isLocationBefore(originalScope.children[i + 1].start, originalScope.children[i].end)) {
+          errors.push(new Error(`The sibling original scopes overlap (${path})`));
+        }
+      }
     }
 
     originalScope.children?.forEach((x, index) => {
@@ -170,9 +190,75 @@ export class SourceMapScopesValidator extends Validator {
       });
     }
 
+    if (this.isLocationBefore(generatedRange.end, generatedRange.start)) {
+      errors.push(new Error(`The generated range's end location is before its start location (${path})`));
+    }
+    if (generatedRange.children?.length) {
+      if (this.isLocationBefore(generatedRange.children[0].start, generatedRange.start)) {
+        errors.push(new Error(`The generated range's start location is outside of its parent (${path})`));
+      }
+      if (this.isLocationBefore(generatedRange.end, generatedRange.children[generatedRange.children.length - 1].end)) {
+        errors.push(new Error(`The generated range's end location is outside of its parent (${path})`));
+      }
+      for (let i = 0; i < generatedRange.children.length - 1; i++) {
+        if (this.isLocationBefore(generatedRange.children[i + 1].start, generatedRange.children[i].end)) {
+          errors.push(new Error(`The sibling original scopes overlap (${path})`));
+        }
+      }
+    }
+
     generatedRange.children?.forEach((x, index) => {
       this.validateGeneratedRange(`${path}.children[${index}]`, x, errors, sourceMap, originalFiles, generatedFile);
     })
+  }
+
+  private async validateMappingConsistency(
+    originalScopes: OriginalScope[],
+    generatedRange: GeneratedRange,
+    errors: Error[],
+    sourceMap: SourceMap,
+  ) {
+    try {
+      await SourceMapConsumer.with(sourceMap, null, (consumer) => {
+        consumer.eachMapping((mapping) => {
+          const sourceIndex = sourceMap.sources.indexOf((source: string) => source === mapping.source);
+
+          const generatedRangeChain = getGeneratedRangeChain({
+            line: mapping.generatedLine - 1,
+            column: mapping.generatedColumn
+          }, generatedRange);
+
+          let originalScopeChain = getOriginalScopeChain({
+            line: mapping.originalLine - 1,
+            column: mapping.originalColumn,
+            sourceIndex
+          }, originalScopes[sourceIndex]);
+
+          for (const generatedRange of generatedRangeChain) {
+            if (!generatedRange.original) {
+              continue;
+            }
+
+            if (generatedRange.original.callsite) {
+              originalScopeChain = getOriginalScopeChain(
+                generatedRange.original.callsite,
+                originalScopes[sourceIndex]
+              );
+            }
+
+            if (!originalScopeChain.includes(generatedRange.original.scope)) {
+              errors.push(new Error(`OriginalScope reference is inconsistent with mappings`));
+            }
+          }
+        });
+      });
+    } catch (exn : any) {
+      errors.push(new Error(exn.message));
+    }
+  }
+
+  private isLocationBefore(a: Location, b: Location) {
+    return a.line < b.line || (a.line === b.line && a.column < b.column);
   }
 
   private formatWeirdOriginalScopeMessage(scopeLocation: OriginalLocation, originalFile: TestingFile): string {
