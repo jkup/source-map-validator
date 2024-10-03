@@ -11,6 +11,11 @@ function validateSourceMap(sourceMap : any) : Error[] {
     errors.push(new Error(`Source map version is not 3, got ${sourceMap.version}.`));
   }
 
+  if ('file' in sourceMap) {
+    if (typeof sourceMap.file !== "string")
+      errors.push(new Error('Source map "file" field is not a string.'));
+  }
+
   if ("sections" in sourceMap) {
     if ("mappings" in sourceMap) {
       errors.push(new Error('Source map cannot have both "mappings" and "sections" fields.'));
@@ -31,6 +36,11 @@ function validateSourceMap(sourceMap : any) : Error[] {
       });
     }
   } else {
+    if ('sourceRoot' in sourceMap) {
+      if (typeof sourceMap.sourceRoot !== "string")
+        errors.push(new Error('Source map "sourceRoot" field is not a string.'));
+    }
+
     if (!sourceMap.sources || !Array.isArray(sourceMap.sources)) {
       errors.push(new Error('Source map "sources" field is invalid or missing.'));
     } else {
@@ -39,12 +49,14 @@ function validateSourceMap(sourceMap : any) : Error[] {
       })
     }
 
-    if (!sourceMap.names || !Array.isArray(sourceMap.names)) {
-      errors.push(new Error('Source map "names" field is missing.'));
-    } else {
-      sourceMap.names.forEach((x: unknown, i: number) => {
-        if (typeof x !== "string") errors.push(new Error(`There is a name with an invalid format on the index ${i}. Each name should be defined as a string`))
-      })
+    if ("names" in sourceMap) {
+      if (!Array.isArray(sourceMap.names)) {
+        errors.push(new Error('Source map "names" field is invalid.'));
+      } else {
+        sourceMap.names.forEach((x: unknown, i: number) => {
+          if (typeof x !== "string") errors.push(new Error(`There is a name with an invalid format on the index ${i}. Each name should be defined as a string`))
+        })
+      }
     }
 
     if (!("mappings" in sourceMap)) {
@@ -56,9 +68,11 @@ function validateSourceMap(sourceMap : any) : Error[] {
     if ('sourcesContent' in sourceMap) {
       if (!Array.isArray(sourceMap.sourcesContent))
         errors.push(new Error('Source map "sourcesContent" field is invalid.'));
-      sourceMap.sourcesContent.forEach((x: unknown, i: number) => {
-        if (x !== null && typeof x !== "string") errors.push(new Error(`There is a source content with an invalid format on the index ${i}. Each content should be defined as a strings or null`))
-      })
+      else {
+        sourceMap.sourcesContent.forEach((x: unknown, i: number) => {
+          if (x !== null && typeof x !== "string") errors.push(new Error(`There is a source content with an invalid format on the index ${i}. Each content should be defined as a strings or null`))
+        })
+      }
     }
 
     if ("ignoreList" in sourceMap) {

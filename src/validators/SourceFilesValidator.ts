@@ -7,11 +7,11 @@ import type { ValidationContext } from "../util/ValidationContext.js";
 export class SourceFilesValidator extends Validator {
   validate(context: ValidationContext): ValidationResult {
     const errors: Error[] = [];
-    const { sources, sourcesContent = [] } = context.sourceMap
+    const { sources, sourceRoot, sourcesContent = [] } = context.sourceMap
 
     function check(sources : any) {
       sources.forEach((sourceFileName: string | null, index: number) => {
-        const fullPath = sourceFileName === null ? null : path.join(context.originalFolderPath, sourceFileName);
+        const fullPath = sourceFileName === null ? null : path.join(context.originalFolderPath, sourceRoot || "", sourceFileName);
         // If the path is null, we won't use the source in subsequent passes so
         // it can be ignored. Otherwise ensure the source makes sense.
         if (fullPath !== null) {
