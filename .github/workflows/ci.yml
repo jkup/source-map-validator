@@ -3,9 +3,6 @@
 
 name: Node.js CI
 
-variables:
-  GIT_SUBMODULE_STRATEGY: recursive
-
 on:
   push:
     branches: [ "main" ]
@@ -19,11 +16,13 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [18.x, 20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
