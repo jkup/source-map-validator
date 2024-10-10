@@ -10,7 +10,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const specResourcesBaseDir = path.resolve(__dirname, "../../source-map-tests/resources");
 
 // These tests are known failures that aren't easily fixed at the moment.
-const skippedTests = [
+const knownFailures = [
   // Source maps library does not consider this a parse error.
   "invalidMappingSegmentWithZeroFields",
   // Source maps library ignores the sign bit in the size limit.
@@ -24,9 +24,8 @@ const skippedTests = [
 test.describe("runSourceMapSpecTests", () => {
   sourceMapSpecTests.tests.forEach((testCase) => {
     test(`The source map spec test case "${testCase.name}" has ${testCase.sourceMapIsValid ? "a valid" : "an invalid"} source map`, async (t) => {
-      if (skippedTests.includes(testCase.name)) {
-        t.skip();
-        return;
+      if (knownFailures.includes(testCase.name)) {
+        t.todo("This test has a known failure and doesn't fail the test suite");
       }
       const result = await validateSourceMap([
         "--sourceMap",
@@ -38,8 +37,11 @@ test.describe("runSourceMapSpecTests", () => {
       ]);
       if (testCase.sourceMapIsValid)
         assert.deepEqual(result, { isValid: true }, "expected source map to be valid");
-      else
+      else {
         assert.equal(result.isValid, false, "expected source map to be invalid");
+        if (!result.isValid && result.errors[0])
+           t.diagnostic(result.errors[0].message);
+      }
     });
   });
 });
