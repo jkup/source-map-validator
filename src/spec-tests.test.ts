@@ -4,10 +4,10 @@ import { test } from "node:test";
 import { fileURLToPath } from 'node:url';
 
 import validateSourceMap from "./index.js";
-import sourceMapSpecTests from "../source-map-tests/source-map-spec-tests.json" assert { type: "json" };
+import sourceMapSpecTests from "../source-map-tests/source-map-spec-tests.json" with { type: "json" };
+import rangeMappingsTests from "../source-map-tests/range-mappings-proposal-tests.json" with { type: "json" };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const specResourcesBaseDir = path.resolve(__dirname, "../../source-map-tests/resources");
 
 // These tests are known failures that aren't easily fixed at the moment.
 const knownFailures = [
@@ -19,10 +19,15 @@ const knownFailures = [
   "validMappingFieldsWith32BitMaxValues",
   // Source maps library errors on this.
   "validMappingLargeVLQ",
+  // This test requires fully parsing the mappings in the range mappings
+  // validator which we currently avoid doing.
+  "rangeMappingsInvalidMappingForRange",
 ];
 
-test.describe("runSourceMapSpecTests", () => {
-  sourceMapSpecTests.tests.forEach((testCase) => {
+function runSpecTests(specification : any) {
+  const specResourcesBaseDir = path.resolve(__dirname, "../../source-map-tests/resources/" + (specification.resourceBasePath || ""));
+
+  specification.tests.forEach((testCase : any) => {
     test(`The source map spec test case "${testCase.name}" has ${testCase.sourceMapIsValid ? "a valid" : "an invalid"} source map`, async (t) => {
       if (knownFailures.includes(testCase.name)) {
         t.todo("This test has a known failure and doesn't fail the test suite");
@@ -44,4 +49,12 @@ test.describe("runSourceMapSpecTests", () => {
       }
     });
   });
+}
+
+test.describe("runSourceMapSpecTests", () => {
+  runSpecTests(sourceMapSpecTests);
+});
+
+test.describe("rangeMappingsProposalTests", () => {
+  runSpecTests(rangeMappingsTests);
 });

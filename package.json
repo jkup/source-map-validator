@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc --resolveJsonModule --project ./tsconfig.json",
     "start": "npm run build && node dist/index.js",
-    "test": "npm run build && node --test"
+    "test": "npm run build && node --test 'dist/**/*.test.js'"
   },
   "repository": {
     "type": "git",
@@ -27,16 +27,16 @@
   "dependencies": {
     "@babel/parser": "^7.23.3",
     "@babel/traverse": "^7.23.3",
-    "tc39-proposal-scope-mapping": "^0.1.1",
     "source-map": "^0.8.0-beta.0",
+    "tc39-proposal-scope-mapping": "^0.1.1",
     "vlq": "^2.0.4",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@babel/types": "^7.23.3",
-    "@types/node": "^20.9.0",
+    "@types/node": "^24.12.2",
     "@types/yargs": "^17.0.31",
     "tsm": "^2.3.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3"
   }
 }

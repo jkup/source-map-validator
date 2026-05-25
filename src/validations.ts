@@ -5,6 +5,7 @@ import { SourceMapJSONValidator } from "./validators/SourceMapJSONValidator.js";
 import { SourceMapFormatValidator } from "./validators/SourceMapFormatValidator.js";
 import { SourceMapMappingsValidator } from "./validators/SourceMapMappingsValidator.js";
 import {SourceMapScopesValidator} from "./validators/SourceMapScopesValidator.js";
+import { SourceMapRangeMappingsValidator } from "./validators/SourceMapRangeMappingsValidator.js";
 
 const sourceMapJSONValidation = validation({
     validator: SourceMapJSONValidator,
@@ -40,10 +41,18 @@ const sourceMapScopesValidation = validation({
     prerequisites: [sourceMapJSONValidation, sourceMapFormatValidation, sourceFilesValidation]
 })
 
+const sourceMapRangeMappingsValidation = validation({
+    validator: SourceMapRangeMappingsValidator,
+    name: "SourceMapRangeMappingsValidator",
+    description: "Check that the `rangeMappings` field correctly encode range mappings",
+    prerequisites: [sourceMapJSONValidation, sourceMapFormatValidation]
+})
+
 export default compose(
     sourceMapJSONValidation,
     sourceMapFormatValidation,
     sourceFilesValidation,
     sourceMapMappingsValidation,
-    sourceMapScopesValidation
+    sourceMapScopesValidation,
+    sourceMapRangeMappingsValidation
 )
