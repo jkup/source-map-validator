@@ -1,0 +1,34 @@
+{
+  "name": "sourcemap-validator-cli",
+  "version": "0.1.0",
+  "description": "CLI for source-map-validator",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "sourcemap-validator": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "source-map-validator": "*"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jkup/source-map-validator.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/jkup/source-map-validator/issues"
+  },
+  "homepage": "https://github.com/jkup/source-map-validator#readme",
+  "engines": {
+    "node": ">=18"
+  }
+}

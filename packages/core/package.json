@@ -1,0 +1,41 @@
+{
+  "name": "source-map-validator",
+  "version": "0.1.0",
+  "description": "A comprehensive source map validator — validates format, mappings, coverage, and semantic accuracy against ECMA-426",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "source-map",
+    "sourcemap",
+    "validator",
+    "lint",
+    "ecma-426",
+    "debugging"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jkup/source-map-validator.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/jkup/source-map-validator/issues"
+  },
+  "homepage": "https://github.com/jkup/source-map-validator#readme",
+  "engines": {
+    "node": ">=18"
+  }
+}

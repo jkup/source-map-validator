@@ -1,42 +1,30 @@
 {
-  "name": "source-map-validator",
-  "version": "0.0.1",
-  "description": "A source map validator",
-  "main": "dist/index.js",
-  "type": "module",
-  "scripts": {
-    "build": "tsc --resolveJsonModule --project ./tsconfig.json",
-    "start": "npm run build && node dist/index.js",
-    "test": "npm run build && node --test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jkup/source-map-validator.git"
-  },
-  "keywords": [
-    "source",
-    "map",
-    "validator"
+  "name": "source-map-validator-monorepo",
+  "private": true,
+  "packageManager": "npm@11.9.0",
+  "workspaces": [
+    "packages/*"
   ],
-  "author": "Jon Kuperman",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/jkup/source-map-validator/issues"
-  },
-  "homepage": "https://github.com/jkup/source-map-validator#readme",
-  "dependencies": {
-    "@babel/parser": "^7.23.3",
-    "@babel/traverse": "^7.23.3",
-    "tc39-proposal-scope-mapping": "^0.1.1",
-    "source-map": "^0.8.0-beta.0",
-    "vlq": "^2.0.4",
-    "yargs": "^17.7.2"
+  "scripts": {
+    "build": "turbo run build",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "typecheck": "turbo run typecheck",
+    "lint": "eslint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "update-spec-tests": "node scripts/update-spec-tests.mjs"
   },
   "devDependencies": {
-    "@babel/types": "^7.23.3",
-    "@types/node": "^20.9.0",
-    "@types/yargs": "^17.0.31",
-    "tsm": "^2.3.0",
-    "typescript": "^5.2.2"
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.6.0",
+    "eslint": "^10.2.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.8.0",
+    "prettier": "^3.8.3",
+    "turbo": "^2.0.0",
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.59.1",
+    "vitest": "^2.0.0"
   }
 }
