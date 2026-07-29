@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "sources": ["../src/app.ts"],
+  "sourcesContent": ["const greeting: string = \"hello world\";\nconsole.log(greeting);\n"],
+  "names": ["greeting", "console", "log"],
+  "mappings": "AAAA,MAAMA,QAAQ,GAAG,aAAa,CAAC;AAC/BC,OAAO,CAACC,GAAG,CAACF,QAAQ,CAAC,CAAA",
+  "file": "app.js"
+}
